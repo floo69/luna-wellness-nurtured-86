@@ -13,6 +13,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 
+// Import new components
+import MoodEnergyDialog from '@/components/track/MoodEnergyDialog';
+import MedicationDialog from '@/components/track/MedicationDialog';
+import { MoodType, EnergyType, MedicationType } from '@/types/health-tracking';
+
 const Track = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState('Sarah');
@@ -53,6 +58,28 @@ const Track = () => {
     });
     setOpenDialog(null);
     setSelectedSymptoms([]);
+  };
+
+  const handleLogMoodEnergy = (data: { mood: MoodType; energy: EnergyType; date: Date; notes?: string }) => {
+    toast({
+      title: "Mood & Energy logged successfully",
+      description: `You've logged your mood as "${data.mood}" and energy as "${data.energy}".`,
+    });
+  };
+
+  const handleLogMedication = (data: {
+    type: MedicationType;
+    name: string;
+    dosage?: string;
+    date: Date;
+    isScheduled: boolean;
+    scheduledTime?: string;
+    notes?: string;
+  }) => {
+    toast({
+      title: "Medication logged successfully",
+      description: `You've logged ${data.name} ${data.dosage ? `(${data.dosage})` : ''}.`,
+    });
   };
   
   const toggleSymptom = (symptomId: string) => {
@@ -405,51 +432,19 @@ const Track = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Mood & Energy Dialog would go here */}
-      <Dialog open={openDialog === 'mood'} onOpenChange={() => setOpenDialog(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Log Mood & Energy</DialogTitle>
-            <DialogDescription>
-              Track how you're feeling today.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <p className="text-center text-sm text-gray-500">Coming soon!</p>
-          </div>
-          <DialogFooter>
-            <Button 
-              type="button" 
-              onClick={() => setOpenDialog(null)}
-            >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Mood & Energy Dialog */}
+      <MoodEnergyDialog 
+        open={openDialog === 'mood'} 
+        onOpenChange={() => setOpenDialog(null)}
+        onSave={handleLogMoodEnergy}
+      />
       
-      {/* Medication Dialog would go here */}
-      <Dialog open={openDialog === 'medication'} onOpenChange={() => setOpenDialog(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Log Medication</DialogTitle>
-            <DialogDescription>
-              Keep track of your medications and supplements.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <p className="text-center text-sm text-gray-500">Coming soon!</p>
-          </div>
-          <DialogFooter>
-            <Button 
-              type="button" 
-              onClick={() => setOpenDialog(null)}
-            >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Medication Dialog */}
+      <MedicationDialog 
+        open={openDialog === 'medication'} 
+        onOpenChange={() => setOpenDialog(null)}
+        onSave={handleLogMedication}
+      />
     </div>
   );
 };
